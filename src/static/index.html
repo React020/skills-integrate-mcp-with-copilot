@@ -22,7 +22,22 @@
       </section>
 
       <section id="signup-container">
-        <h3>Sign Up for an Activity</h3>
+        <h3>Teacher Login</h3>
+        <form id="login-form">
+          <div class="form-group">
+            <label for="username">Teacher Username:</label>
+            <input type="text" id="username" required />
+          </div>
+          <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" required />
+          </div>
+          <button type="submit">Log In</button>
+        </form>
+        <button id="logout-button" class="hidden" type="button">Log Out</button>
+        <p id="login-status" class="login-status">Students can view activities and participants without logging in.</p>
+        <div id="signup-form-container" class="hidden">
+          <h3>Register a Student</h3>
         <form id="signup-form">
           <div class="form-group">
             <label for="email">Student Email:</label>
@@ -37,6 +52,7 @@
           </div>
           <button type="submit">Sign Up</button>
         </form>
+        </div>
         <div id="message" class="hidden"></div>
       </section>
     </main>

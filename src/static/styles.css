@@ -192,6 +192,11 @@ button:hover {
   display: none;
 }
 
+.login-status {
+  margin-top: 15px;
+  color: #666;
+}
+
 footer {
   text-align: center;
   margin-top: 30px;

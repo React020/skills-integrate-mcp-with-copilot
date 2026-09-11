@@ -2,7 +2,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const activitiesList = document.getElementById("activities-list");
   const activitySelect = document.getElementById("activity");
   const signupForm = document.getElementById("signup-form");
+  const loginForm = document.getElementById("login-form");
+  const logoutButton = document.getElementById("logout-button");
+  const signupFormContainer = document.getElementById("signup-form-container");
+  const loginStatus = document.getElementById("login-status");
   const messageDiv = document.getElementById("message");
+  let isTeacherLoggedIn = false;
+
+  function setTeacherState(loggedIn) {
+    isTeacherLoggedIn = loggedIn;
+    loginForm.classList.toggle("hidden", loggedIn);
+    logoutButton.classList.toggle("hidden", !loggedIn);
+    signupFormContainer.classList.toggle("hidden", !loggedIn);
+    loginStatus.textContent = loggedIn
+      ? "Teacher mode is active. You can register or unregister students."
+      : "Students can view activities and participants without logging in.";
+    fetchActivities();
+  }
 
   // Function to fetch activities from API
   async function fetchActivities() {
@@ -30,7 +46,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 ${details.participants
                   .map(
                     (email) =>
-                      `<li><span class="participant-email">${email}</span><button class="delete-btn" data-activity="${name}" data-email="${email}">❌</button></li>`
+                      `<li><span class="participant-email">${email}</span>${
+                        isTeacherLoggedIn
+                          ? `<button class="delete-btn" data-activity="${name}" data-email="${email}">❌</button>`
+                          : ""
+                      }</li>`
                   )
                   .join("")}
               </ul>
@@ -153,6 +173,39 @@ document.addEventListener("DOMContentLoaded", () => {
       messageDiv.classList.remove("hidden");
       console.error("Error signing up:", error);
     }
+  });
+
+  loginForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const response = await fetch("/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: document.getElementById("username").value,
+        password: document.getElementById("password").value,
+      }),
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      loginForm.reset();
+      setTeacherState(true);
+      messageDiv.textContent = result.message;
+      messageDiv.className = "success";
+    } else {
+      messageDiv.textContent = result.detail || "Unable to log in";
+      messageDiv.className = "error";
+    }
+    messageDiv.classList.remove("hidden");
+  });
+
+  logoutButton.addEventListener("click", async () => {
+    await fetch("/auth/logout", { method: "POST" });
+    setTeacherState(false);
+    messageDiv.textContent = "Logged out";
+    messageDiv.className = "success";
+    messageDiv.classList.remove("hidden");
   });
 
   // Initialize app
